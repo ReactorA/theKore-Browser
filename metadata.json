@@ -1,0 +1,8 @@
+{
+  "name": "TheKore Browser",
+  "description": "A high-performance hybrid browser for gamers and professionals, featuring a dual-core AI search engine, resource management controls, and dynamic thematic environments.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
