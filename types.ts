@@ -6,24 +6,25 @@ export enum ThemeType {
   ZENITH = 'ZENITH'
 }
 
-export interface ResourceState {
-  cpuLimit: number;
-  ramLimit: number;
-  currentCpu: number;
-  currentRam: number;
-  isThrottled: boolean;
+export interface Tab {
+  id: string;
+  title: string;
+  url?: string;
+  type: 'home' | 'search' | 'ai';
+  searchQuery?: string;
+}
+
+export interface UserSession {
+  email: string;
+  name: string;
+  avatar: string;
+  isLoggedIn: boolean;
 }
 
 export type SearchMode = 'GOOGLE' | 'KORE_AI';
 
-export interface SearchResult {
-  title: string;
-  url: string;
-  snippet: string;
-}
-
 export interface AIResponse {
   text: string;
   isLoading: boolean;
-  error?: string;
+  groundingLinks?: Array<{ title: string; uri: string }>;
 }

@@ -2,35 +2,34 @@
 import { GoogleGenAI } from "@google/genai";
 
 export class GeminiService {
-  private ai: GoogleGenAI;
-
-  constructor() {
-    this.ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-  }
-
-  async askKore(prompt: string, onUpdate: (text: string) => void) {
+  async askKore(prompt: string, onUpdate: (text: string, links?: any[]) => void) {
+    // Always use new GoogleGenAI({ apiKey: process.env.API_KEY }) as per guidelines
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     try {
-      const response = await this.ai.models.generateContentStream({
+      const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: prompt,
         config: {
-          systemInstruction: `You are Kore AI, the high-performance intelligence core of TheKore Browser. 
-          Your personality is sleek, technical, and highly efficient. 
-          Provide concise, direct answers with a "gamer/pro developer" tone. 
-          Use technical terms where appropriate but keep readability high. 
-          Format using Markdown.`,
-          temperature: 0.7,
+          systemInstruction: `You are Kore AI. You have access to real-time information via Google Search. 
+          Respond in a high-tech, technical manner. List web sources if you use them.`,
+          tools: [{ googleSearch: {} }]
         }
       });
 
-      let fullText = '';
-      for await (const chunk of response) {
-        fullText += chunk.text;
-        onUpdate(fullText);
-      }
+      // Using .text property directly as per library standards
+      const text = response.text || "I was unable to process that request.";
+      
+      // Extracting grounding chunks for transparency and source listing
+      const grounding = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+      const links = grounding.map((chunk: any) => ({
+        title: chunk.web?.title || 'Source',
+        uri: chunk.web?.uri || '#'
+      }));
+
+      onUpdate(text, links);
     } catch (error) {
       console.error("Gemini Error:", error);
-      onUpdate("ERROR: Internal Core Malfunction. Check connection parameters.");
+      onUpdate("ERROR: CONNECTION_REFUSED // INTERNAL_FAILURE", []);
     }
   }
 }
