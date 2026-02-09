@@ -1,23 +1,23 @@
-import { defineConfig } from 'vite';
+import path from 'path';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  // IMPORTANT: This 'base' must match your GitHub repository name exactly.
-  // This is what prevents the 'blank white screen' error.
-  base: '/theKore-Browser/', 
-
-  plugins: [react()],
-  
-  build: {
-    // This helps optimize the gaming-focused performance of TheKore
-    outDir: 'dist',
-    assetsDir: 'assets',
-    sourcemap: true,
-  },
-
-  server: {
-    port: 3000,
-    open: true, // Automatically opens the browser for you locally
-  }
+export default defineConfig(({ mode }) => {
+    const env = loadEnv(mode, '.', '');
+    return {
+      server: {
+        port: 3000,
+        host: '0.0.0.0',
+      },
+      plugins: [react()],
+      define: {
+        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+      },
+      resolve: {
+        alias: {
+          '@': path.resolve(__dirname, '.'),
+        }
+      }
+    };
 });
